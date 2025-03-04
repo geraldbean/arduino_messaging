@@ -21,8 +21,7 @@ LiquidCrystal lcd(pin_RS,  pin_EN,  pin_d4,  pin_d5,  pin_d6,  pin_d7);
 #define SELECT 6
 
 // Variables
-char letters[]={'A','B','C','D','E','F','G'};
-//char letters[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"; // Available letters
+char letters[]={'A','B','C','D','E','F','G','H','I','J','K','L','M','O','P','Q','R','S','T','U','V','W','X','Y','Z'};
 int letterIndex = 0;  // Current letter
 int cursorPos = 0;    // Cursor position on LCD
 char typedText[17]; // Stores typed text
@@ -44,7 +43,7 @@ void setup() {
      lcd.setCursor(i,1);//set to second row's columns
      if (letters[letterIndex]){
       lcd.print(letters[letterIndex]);
-     letterIndex+=3;
+     letterIndex+=2;
      }
      else lcd.print(" "); //ensures if no more letters doesn't print hieroglyphs
   }
