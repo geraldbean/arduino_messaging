@@ -1,8 +1,18 @@
 #include <LiquidCrystal.h>
 //Eliana was here
-
-// LCD pin connections: RS, E, D4, D5, D6, D7
-LiquidCrystal lcd(7, 8, 9, 10, 11, 12);
+const int pin_RS = 8; 
+const int pin_EN = 9; 
+const int pin_d4 = 4; 
+const int pin_d5 = 5; 
+const int pin_d6 = 6; 
+const int pin_d7 = 7; 
+const int pin_BL = 10; 
+int value = 100; 
+int flag = 0; //when the button is pressed
+int flagselect = 0;
+int incre = 1; //the value I want to increment the left and right buttons by.
+int incre2 = 10; //the value I want to increment the up and down buttons by.
+LiquidCrystal lcd(pin_RS,  pin_EN,  pin_d4,  pin_d5,  pin_d6,  pin_d7);
 
 // Button pins
 #define LEFT 2
