@@ -1,6 +1,5 @@
 #include <LiquidCrystal.h>
-//Mar 4 5:55 PM -Eliana
-//Summary: changed setup so letters can print
+//Mar 4 6:51 PM
 
 // LCD pin connections: RS, E, D4, D5, D6, D7
 const int pin_RS = 8; 
@@ -22,56 +21,73 @@ LiquidCrystal lcd(pin_RS,  pin_EN,  pin_d4,  pin_d5,  pin_d6,  pin_d7);
 
 // Variables
 char letters[]={'A','B','C','D','E','F','G','H','I','J','K','L','M','O','P','Q','R','S','T','U','V','W','X','Y','Z'};
+//char letters[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"; // Available letters
 int letterIndex = 0;  // Current letter
-int cursorPos = 0;    // Cursor position on LCD
+int cursorPos = 0;    // Cursor column position on LCD
 char typedText[17]; // Stores typed text
+bool flagPressed;//check if buttons were pressed or not
+char boardAlphabet[2][16];
+char boardPrint[16];
+
 
 void setup() {
-  // pinMode(LEFT, INPUT_PULLUP);
-  // pinMode(RIGHT, INPUT_PULLUP);
-  // pinMode(UP, INPUT_PULLUP);
-  // pinMode(DOWN, INPUT_PULLUP);
-  // pinMode(SELECT, INPUT_PULLUP);
   Serial.begin(9600);
   lcd.begin(16, 2); // Set LCD size
   lcd.setCursor(0,0);
   lcd.print("Select Letter:");
   lcd.setCursor(0,1);
   lcd.print(letters[0]);
-  int letterIndex=0;
+  int letterIndexSetup=0;
+  //setting up char array for board and its print array
   for (int i=0;i<16;i++){
-     lcd.setCursor(i,1);//set to second row's columns
-     if (letters[letterIndex]){
-      lcd.print(letters[letterIndex]);
-     letterIndex+=2;
-     }
-     else lcd.print(" "); //ensures if no more letters doesn't print hieroglyphs
+    boardAlphabet[0][i]=letters[letterIndexSetup++];//puts it to letter index, then adds one to it for next letter
+    boardAlphabet[1][i]=letters[letterIndexSetup++];
+    boardPrint[i]=boardAlphabet[0][i];
   }
+  letterIndexSetup=0;
+  for (int i=0;i<16;i++){
+    lcd.setCursor(i,1);//set to second row's columns
+    if (boardPrint[i]){
+     lcd.print(boardPrint[i]);
+    }
+    else lcd.print(" "); //ensures if no more letters doesn't print hieroglyphs
+ }
+  lcd.setCursor(0,1);
   // // updateDisplay();
 }
 
 void loop() {
-  if (digitalRead(LEFT) == LOW) {
-    cursorPos = max(0, cursorPos - 1); // Move cursor left
-    delay(200);
-  }
+  int x=analogRead(0);
+  if (x>800) flagPressed=0;
+  //conditional of button press type and "&&" is to check if the flag was previously not being pressed 
+  //(thus ensuring any duration of button press will work)
   
-  if (digitalRead(RIGHT) == LOW) {
+  //if Right pressed
+  if (x <6 && flagPressed==0) {
+    flagPressed=1;
     cursorPos = min(15, cursorPos + 1); // Move cursor right
-    delay(200);
+    lcd.setCursor(cursorPos,1);
   }
-
-  if (digitalRead(UP) == LOW) {
+  //if Up pressed
+  else if (x<200 && flagPressed==0) {
+    flagPressed=1;
     letterIndex = (letterIndex + 1) % strlen(letters); // Next letter
     delay(200);
   }
-
-  if (digitalRead(DOWN) == LOW) {
+  //if Down pressed
+  else if (x<400 && flagPressed==0) {
+    flagPressed=1;
     letterIndex = (letterIndex - 1 + strlen(letters)) % strlen(letters); // Previous letter
     delay(200);
   }
-
-  if (digitalRead(SELECT) == LOW) {
+  
+  else if (x<600 && flagPressed==0) {
+    flagPressed=1;
+    cursorPos = max(0, cursorPos - 1); // Move cursor left
+    lcd.setCursor(cursorPos,1);
+  }
+  //if Select pressed
+  else if (x<800 && flagPressed==0) {
     typedText[cursorPos] = letters[letterIndex]; // Select letter
     delay(200);
   }
