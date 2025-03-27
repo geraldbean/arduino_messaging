@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-void messageEncoding(char *message,int *sendID, char *transmission){
+void messageEncoding(int ownID ,char *message,int *sendID, char *transmission){
     int mesgeLen = 0;
     while(1){
         if(message[mesgeLen] == '\0'){
@@ -24,7 +24,6 @@ void messageEncoding(char *message,int *sendID, char *transmission){
     for(i = 1; i <= numSend; i++){
         transmission[i] = sendID[i-1];
     }
-    printf("2:%d\n",i);
     transmission[i] = mesgeLen;
     i++;
     int d = i;
@@ -32,6 +31,7 @@ void messageEncoding(char *message,int *sendID, char *transmission){
         transmission[i] = message[i-d];
         i++;
     }
+    transmission[i] = ownID;
     return;
     
 }
@@ -66,18 +66,24 @@ int messageDecoding(char *input,int currentID, char *message, int IDsInMessage[]
         }
         i++;
     }
-    return 1;
+    i = 0;
+    while(input[i] != '\0'){
+        i++;
+    }
+    i--;
+    return input[i];
     
 
     
 }
 
 int main(void){
-    char msg[] = "HelloTesting102030405060708090";
-    int ID[] = {10,20,30,76,99,12,24,62,13,0};
-    char transmission[255];
+    char msg[] = "Testing";
+    int OwnID = 5;
+    int ID[] = {10,20,30,0};
+    char transmission[255] = {'\0'};
 
-    messageEncoding(msg,ID,transmission);
+    messageEncoding(OwnID,msg,ID,transmission);
     /*printf("Number of people its being sent to: %d\n",transmission[0]);
     printf("Recipient ID: %d\n",transmission[1]);
     printf("Recipient ID: %d\n",transmission[2]);
@@ -89,18 +95,18 @@ int main(void){
         printf("%c",transmission[i]);
     }*/
 
-    char *input = transmission;
     int currentID = 10;
     char outputMesg[255] = {'\0'};
     int outputIDs[255] = {0};
 
-    int result = messageDecoding(input, currentID,outputMesg,outputIDs);
+    int result = messageDecoding(transmission, currentID,outputMesg,outputIDs);
     if(result == 0){
         //Code for no message recieved
         printf("No message recieved");
     }
-    if(result == 1){
+    if(result != 0){
         //sent outputMesg to print and the outputIDs to print
+        printf("ID of sender is: %d\n",result);
         printf("Message is:");
         for(int i = 0; outputMesg[i] != '\0';i++){
             printf("%c",outputMesg[i]);
