@@ -1,5 +1,5 @@
 #include <LiquidCrystal.h>
-//Mar 4 6:51 PM
+//Mar 27
 
 // LCD pin connections: RS, E, D4, D5, D6, D7
 const int pin_RS = 8;
@@ -26,7 +26,7 @@ char letters[]={'A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P',
 int rowIndex = 0;  // Current letter
 int tempLetterIndex=rowIndex;
 int cursorPos = 0;    // Cursor column position on LCD
-int tempCursorPos=cursorPos;
+int msgPos=4;
 char selectedText[MAX_TEXT];
 char typedText[17]; // Stores typed text
 int textEmptyIndex=0;
@@ -37,11 +37,18 @@ char boardPrint[16];
 
 void setup() {
   Serial.begin(9600);
-  textSetup(letters,boardAlphabet,boardPrint);
+  textSetup();
 }
 
 void loop() {
+  inputMessage();
+
+}
+
+void inputMessage(){
   int x=analogRead(0);
+  int tempCursorPos=cursorPos;
+
   if (x>800) flagPressed=0;
   //conditional of button press type and "&&" is to check if the flag was previously not being pressed
   //(thus ensuring any duration of button press will work)
@@ -99,16 +106,24 @@ void loop() {
   }
   //if Select pressed
   else if (x<800 && flagPressed==0) {
+    //delete a letter
     if (cursorPos==15 && textEmptyIndex!=0){
       textEmptyIndex--;
       Serial.print("Deleted from msg:");
       Serial.println(selectedText[textEmptyIndex]);
+      msgPos--;
+      lcd.setCursor(msgPos,0);
+      lcd.print(" ");
       selectedText[textEmptyIndex]=NULL;
     }
+    //add letters
     if (textEmptyIndex<MAX_TEXT){
       if (cursorPos<13){
         selectedText[textEmptyIndex] = boardPrint[cursorPos]; // Select letter
         Serial.print(selectedText[textEmptyIndex]);
+        lcd.setCursor(msgPos,0);
+        lcd.print(selectedText[textEmptyIndex]);
+        msgPos++;
         textEmptyIndex++;//increment to indicate next empty index
       }
     }else {
@@ -124,10 +139,10 @@ void loop() {
   updateDisplay();
 }
 
-void textSetup(char* letters, char boardAlphabet[2][13], char* boardPrint){
+void textSetup(){
   lcd.begin(16, 2); // Set LCD size
   lcd.setCursor(0,0);
-  lcd.print("Select Letter:");
+  lcd.print("Msg:");
   int letterIndexSetup=0;
   //setting up char array for board and its print array
   //Serial.println("boardAlphabet array:");//print statement check
